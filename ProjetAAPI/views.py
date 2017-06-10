@@ -75,7 +75,7 @@ def drink_detail(request, pk):
         serializer = DrinkSerializer(drink)
         return JsonResponse(serializer.data, status=status.HTTP_200_OK)
 
-    elif request.methode == 'PUT':
+    elif request.method == 'PUT':
         try:
             data = JSONParser().parse(request)
         except ParseError:
@@ -87,7 +87,7 @@ def drink_detail(request, pk):
         else:
             return JsonResponse(serializer.data, status=status.HTTP_400_BAD_REQUEST)
 
-    elif request.methode == 'DELETE':
+    elif request.method == 'DELETE':
         drink.delete()
         return HttpResponse(status=status.HTTP_204_NO_CONTENT)
 
@@ -133,7 +133,7 @@ def queue_detail(request, pk):
         serializer = QueueSerializer(queue)
         return JsonResponse(serializer.data, status=status.HTTP_200_OK)
 
-    elif request.methode == 'PUT':
+    elif request.method == 'PUT':
         try:
             data = JSONParser().parse(request)
         except ParseError:
@@ -145,7 +145,7 @@ def queue_detail(request, pk):
         else:
             return JsonResponse(serializer.data, status=status.HTTP_400_BAD_REQUEST)
 
-    elif request.methode == 'DELETE':
+    elif request.method == 'DELETE':
         queue.delete()
         return HttpResponse(status=status.HTTP_204_NO_CONTENT)
 
@@ -165,19 +165,21 @@ def cocktail_list(request):
         return JsonResponse(serializer.data, safe=False, status=status.HTTP_200_OK)
 
     elif request.method == 'POST':
-        try:
-            data = JSONParser().parse(request)
-        except ParseError:
-            return HttpResponse(status=400)
+        if check_request_token(request):
+            try:
+                data = JSONParser().parse(request)
+            except ParseError:
+                return HttpResponse(status=400)
 
-        serializer = CocktailSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
+            serializer = CocktailSerializer(data=data)
+            if serializer.is_valid():
+                serializer.save()
 
-            return JsonResponse(serializer.data, status=status.HTTP_201_CREATED)
+                return JsonResponse(serializer.data, status=status.HTTP_201_CREATED)
+            else:
+                return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         else:
-            return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+            return HttpResponse(status=status.HTTP_401_UNAUTHORIZED)
     else:
         return HttpResponse(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
@@ -193,7 +195,7 @@ def cocktail_detail(request, pk):
         serializer = CocktailSerializerGet(cocktail)
         return JsonResponse(serializer.data, status=status.HTTP_200_OK)
 
-    elif request.methode == 'PUT':
+    elif request.method == 'PUT':
         try:
             data = JSONParser().parse(request)
         except ParseError:
@@ -205,7 +207,7 @@ def cocktail_detail(request, pk):
         else:
             return JsonResponse(serializer.data, status=status.HTTP_400_BAD_REQUEST)
 
-    elif request.methode == 'DELETE':
+    elif request.method == 'DELETE':
         cocktail.delete()
         return HttpResponse(status=status.HTTP_204_NO_CONTENT)
 
@@ -219,13 +221,14 @@ def cocktail_detail(request, pk):
 
 @csrf_exempt
 def user_list(request):
-    if check_request_token(request):
-        if request.method == 'GET':
-            user = UserInformation.objects.all()
-            serializer = UserInformationSerializer(user, many=True)
-            return JsonResponse(serializer.data, safe=False, status=status.HTTP_200_OK)
 
-        elif request.method == 'POST':
+    if request.method == 'GET':
+        user = UserInformation.objects.all()
+        serializer = UserInformationSerializer(user, many=True)
+        return JsonResponse(serializer.data, safe=False, status=status.HTTP_200_OK)
+
+    elif check_request_token(request):
+        if request.method == 'POST':
             try:
                 data = JSONParser().parse(request)
             except ParseError:
@@ -244,9 +247,13 @@ def user_list(request):
 
         else:
             return HttpResponse(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    else:
+        return HttpResponse(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 @csrf_exempt
 def user_detail(request, pk):
+    coins = request.GET.get('addCoin', 0)
+    print(coins)
     try:
         user = UserInformation.objects.get(pk=pk)
     except user.DoesNotExist:
@@ -257,7 +264,7 @@ def user_detail(request, pk):
         serializer = UserInformationSerializer(user)
         return JsonResponse(serializer.data, status=status.HTTP_200_OK)
 
-    elif request.methode == 'PUT':
+    elif request.method == 'PUT':
         try:
             data = JSONParser().parse(request)
         except ParseError:
@@ -269,7 +276,7 @@ def user_detail(request, pk):
         else:
             return JsonResponse(serializer.data, status=status.HTTP_400_BAD_REQUEST)
 
-    elif request.methode == 'DELETE':
+    elif request.method == 'DELETE':
         user.delete()
         return HttpResponse(status=status.HTTP_204_NO_CONTENT)
 

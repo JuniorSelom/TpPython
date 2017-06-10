@@ -25,7 +25,7 @@ SECRET_KEY = 'veqmc!=m5#4%%9=$lww-f(tx9-e50^=ps&p2m@+%ofks_9j!7b'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
