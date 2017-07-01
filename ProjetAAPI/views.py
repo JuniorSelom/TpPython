@@ -43,9 +43,12 @@ def login(request):
 @csrf_exempt
 def drink_list(request):
     if request.method == 'GET':
-        drinks = Drink.objects.all()
-        serializer = DrinkSerializer(drinks, many=True)
-        return JsonResponse(serializer.data, safe=False, status=status.HTTP_200_OK)
+        if check_request_token(request):
+            drinks = Drink.objects.all()
+            serializer = DrinkSerializer(drinks, many=True)
+            return JsonResponse(serializer.data, safe=False, status=status.HTTP_200_OK)
+        else:
+            return HttpResponse(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
     elif request.method == 'POST':
         try:
@@ -282,3 +285,23 @@ def user_detail(request, pk):
 
     else:
         return HttpResponse(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+@csrf_exempt
+def commander(request, pk):
+    if check_request_token(request):
+        basic = get_basic_auth(request)
+        token = Token.objects.get(hash=basic)
+        user = token.user
+        cocktail = Cocktail.objects.get(pk=pk)
+        if cocktail.enoughmoney(user):
+            queue = Queue(user=user.userinformation, cocktail=cocktail)
+            queue.save()
+            data = QueueSerializer(queue)
+            return JsonResponse(data=data.data, safe=False, status=status.HTTP_200_OK)
+        else:
+            return JsonResponse(data=False,safe=False,status=status.HTTP_200_OK)
+        return HttpResponse(status=status.HTTP_200_OK)
+    else:
+        return HttpResponse(status=status.HTTP_501_NOT_IMPLEMENTED)
+

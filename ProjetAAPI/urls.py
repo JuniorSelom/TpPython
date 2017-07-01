@@ -29,4 +29,5 @@ urlpatterns = [
     url(r'^cocktails/(?P<pk>[0-9]+)/$', views.cocktail_detail, name='cocktail-details'),
     url(r'^users$', views.user_list, name='user-list'),
     url(r'^users/(?P<pk>[0-9]+)/$', views.user_detail, name='user-details'),
+    url(r'^commander/(?P<pk>[0-9]+)$', views.commander, name='user-commande'),
 ]

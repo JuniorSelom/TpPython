@@ -56,7 +56,7 @@ class CocktailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Cocktail
-        fields = ('id', 'name', 'drinks', 'video')
+        fields = ('id', 'name', 'drinks', 'video', 'prix')
 
 
 class CocktailSerializerGet(serializers.ModelSerializer):
@@ -65,12 +65,15 @@ class CocktailSerializerGet(serializers.ModelSerializer):
 
     class Meta:
         model = Cocktail
-        fields = ('id', 'name', 'drinks', 'video')
+        fields = ('id', 'name', 'drinks', 'video','prix')
 
 
-class QueueSerializer(serializers.HyperlinkedModelSerializer):
+class QueueSerializer(serializers.ModelSerializer):
+    cocktail = CocktailSerializer(many=False)
+    cocktail.drinks = DrinkSerializer(many=True)
+
     class Meta:
         model = Queue
-        fields = ('id', 'user', 'cocktail', 'mode', 'date')
+        fields = ('id', 'user', 'cocktail', 'date')
 
 

@@ -25,12 +25,21 @@ class Drink(models.Model):
 class Cocktail(models.Model):
     name = models.CharField(max_length=50)
     drinks = models.ManyToManyField(Drink, related_name="cocktails")
+    prix = models.IntegerField(default=5)
 
     def save(self, *args, **kwargs):
         super(Cocktail, self).save(*args, **kwargs)
         link = youtube_search(self.name)
 
         Video.objects.create(url=link, cocktail=self)
+
+    def enoughmoney(self , user):
+        if user is None:
+            return False
+        if user.userinformation.coin < self.prix:
+            return False
+        else:
+            return True
 
 
 class Video(models.Model):
@@ -40,9 +49,9 @@ class Video(models.Model):
 
 class Queue(models.Model):
     user = models.ForeignKey(UserInformation, on_delete=models.CASCADE)
-    date = models.DateTimeField()
+    date = models.DateTimeField(auto_now_add=True, blank=True)
     cocktail = models.ForeignKey(Cocktail, on_delete=models.CASCADE)
-    state = models.CharField(max_length=20)
+    state = models.CharField(max_length=20, default=1)
 
 
 class Token(models.Model):
