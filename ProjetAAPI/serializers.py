@@ -72,7 +72,6 @@ class QueueSerializer(serializers.ModelSerializer):
     user = UserInformationSerializer()
     cocktail = CocktailSerializerGet(many=False)
 
-
     class Meta:
         model = Queue
         fields = ('id', 'user', 'cocktail', 'date', 'state', 'uuid')

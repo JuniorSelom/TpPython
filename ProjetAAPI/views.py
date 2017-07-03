@@ -17,6 +17,7 @@ from django.contrib.auth import authenticate
 from base64 import b64decode
 from .auth import get_or_create_token, get_basic_auth,check_request_token
 from django.contrib.auth.hashers import make_password
+import uuid
 
 # -------------
 # --- LOGIN ---
@@ -301,7 +302,7 @@ def commander(request, pk):
         user = token.user
         cocktail = Cocktail.objects.get(pk=pk)
         if cocktail.enoughmoney(user):
-            queue = Queue(user=user.userinformation, cocktail=cocktail)
+            queue = Queue(user=user.userinformation, cocktail=cocktail , uuid=uuid.uuid4())
             queue.save()
             UserInformation.objects.filter(pk=user.userinformation.id).update(coin=(user.userinformation.coin - cocktail.prix))
             data = QueueSerializer(queue)
