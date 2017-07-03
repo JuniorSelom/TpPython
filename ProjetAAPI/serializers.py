@@ -70,8 +70,8 @@ class CocktailSerializerGet(serializers.ModelSerializer):
 
 class QueueSerializer(serializers.ModelSerializer):
     user = UserInformationSerializer()
-    cocktail = CocktailSerializer(many=False)
-    cocktail.drinks = DrinkSerializer(many=True)
+    cocktail = CocktailSerializerGet(many=False)
+
 
     class Meta:
         model = Queue
