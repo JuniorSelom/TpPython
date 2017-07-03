@@ -304,7 +304,6 @@ def commander(request, pk):
             queue = Queue(user=user.userinformation, cocktail=cocktail)
             queue.save()
             UserInformation.objects.filter(pk=user.userinformation.id).update(coin=(user.userinformation.coin - cocktail.prix))
-            #user.save()
             data = QueueSerializer(queue)
             return JsonResponse(data=data.data, safe=False, status=status.HTTP_200_OK)
         else:

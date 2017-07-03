@@ -4,6 +4,7 @@ from django.utils import timezone
 import datetime
 from django.db import models
 from .youtubeAPI import youtube_search
+import uuid
 # Create your models here
 
 
@@ -52,6 +53,7 @@ class Queue(models.Model):
     date = models.DateTimeField(auto_now_add=True, blank=True)
     cocktail = models.ForeignKey(Cocktail, on_delete=models.CASCADE)
     state = models.CharField(max_length=20, default=1)
+    uuid = models.UUIDField(default= uuid.uuid4(), editable=False, unique=True)
 
 
 class Token(models.Model):
@@ -61,5 +63,4 @@ class Token(models.Model):
 
     def is_expired(self):
         return self.expiration_date < timezone.now()
-
 

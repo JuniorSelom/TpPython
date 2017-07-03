@@ -75,6 +75,6 @@ class QueueSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Queue
-        fields = ('id', 'user', 'cocktail', 'date', 'state')
+        fields = ('id', 'user', 'cocktail', 'date', 'state', 'uuid')
 
 
