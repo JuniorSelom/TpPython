@@ -69,11 +69,12 @@ class CocktailSerializerGet(serializers.ModelSerializer):
 
 
 class QueueSerializer(serializers.ModelSerializer):
+    user = UserInformationSerializer()
     cocktail = CocktailSerializer(many=False)
     cocktail.drinks = DrinkSerializer(many=True)
 
     class Meta:
         model = Queue
-        fields = ('id', 'user', 'cocktail', 'date')
+        fields = ('id', 'user', 'cocktail', 'date', 'state')
 
 

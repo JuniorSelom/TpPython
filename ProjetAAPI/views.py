@@ -155,6 +155,12 @@ def queue_detail(request, pk):
     else:
         return HttpResponse(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
+@csrf_exempt
+def deleteAllQueue(request):
+    queue = Queue.objects.all()
+    queue.delete()
+    return HttpResponse(status=status.HTTP_200_OK)
+
 # ----------------
 # --- COCKTAIL ---
 # ----------------
@@ -297,6 +303,8 @@ def commander(request, pk):
         if cocktail.enoughmoney(user):
             queue = Queue(user=user.userinformation, cocktail=cocktail)
             queue.save()
+            UserInformation.objects.filter(pk=user.userinformation.id).update(coin=(user.userinformation.coin - cocktail.prix))
+            #user.save()
             data = QueueSerializer(queue)
             return JsonResponse(data=data.data, safe=False, status=status.HTTP_200_OK)
         else:
@@ -304,4 +312,6 @@ def commander(request, pk):
         return HttpResponse(status=status.HTTP_200_OK)
     else:
         return HttpResponse(status=status.HTTP_501_NOT_IMPLEMENTED)
+
+
 
