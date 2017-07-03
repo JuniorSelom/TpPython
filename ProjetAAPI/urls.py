@@ -30,5 +30,6 @@ urlpatterns = [
     url(r'^users$', views.user_list, name='user-list'),
     url(r'^users/(?P<pk>[0-9]+)/$', views.user_detail, name='user-details'),
     url(r'^commander/(?P<pk>[0-9]+)$', views.commander, name='user-commande'),
+    url(r'^commande/(?P<pk>[0-9a-f-]+)$', views.getcommande, name='user-getcommande'),
     url(r'^deleteq$', views.deleteAllQueue, name='delete-queue'),
 ]
