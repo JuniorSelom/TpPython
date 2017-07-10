@@ -315,14 +315,3 @@ def commander(request, pk):
 
 
 
-@csrf_exempt
-def getcommande(request, pk):
-    if check_request_token(request):
-        queue = Queue.objects.get(uuid=pk)
-        if queue is not None:
-            data = QueueSerializer(queue)
-            return JsonResponse(data=data.data, safe=False, status=status.HTTP_200_OK)
-        else:
-            return HttpResponse(status=status.HTTP_404_NOT_FOUND)
-    else:
-        return HttpResponse(status=status.HTTP_501_NOT_IMPLEMENTED)
