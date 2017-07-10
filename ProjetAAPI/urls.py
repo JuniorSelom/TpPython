@@ -31,4 +31,8 @@ urlpatterns = [
     url(r'^users/(?P<pk>[0-9]+)/$', views.user_detail, name='user-details'),
     url(r'^commander/(?P<pk>[0-9]+)$', views.commander, name='user-commande'),
     url(r'^deleteq$', views.deleteAllQueue, name='delete-queue'),
+    url(r'validecommande/(?P<uuid>[^/]+)/$', views.commandeserve, name='update-queue-t'),
+    url(r'getqueu$', views.getqueueforuser, name='queue-for-user'),
+    url(r'addcoin$', views.addcoin, name='add-coin'),
+    url(r'createuser$', views.create_user, name='create-user'),
 ]

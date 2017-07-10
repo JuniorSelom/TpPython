@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 from .youtubeAPI import youtube_search
-
+from django.db.models import F
 from django.shortcuts import render
-
+from django.contrib.auth.models import User
 # Create your views here.
 from django.shortcuts import render
 from rest_framework import status
@@ -33,7 +33,8 @@ def login(request):
         print(user)
         if user is not None:
             token = get_or_create_token(user)
-            return JsonResponse(data={'token': token.hash})
+            serializer = UserSerializer(user)
+            return JsonResponse(data={'token': token.hash,'user':serializer.data})
         return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
 
 # -------------
@@ -162,6 +163,36 @@ def deleteAllQueue(request):
     queue.delete()
     return HttpResponse(status=status.HTTP_200_OK)
 
+@csrf_exempt
+def commandeserve(request , uuid):
+    if check_request_token(request):
+        basic = get_basic_auth(request)
+        token = Token.objects.get(hash=basic)
+        user = token.user
+        if user:
+            queue = Queue.objects.filter(uuid=uuid)
+            if queue:
+                queue.update(state="0")
+                return HttpResponse(status=status.HTTP_200_OK)
+            else:
+                return HttpResponse(status=status.HTTP_404_NOT_FOUND)
+        else:
+            return HttpResponse(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    else:
+        return HttpResponse(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    return HttpResponse(status=status.HTTP_501_NOT_IMPLEMENTED)
+
+def getqueueforuser(request):
+    if check_request_token(request):
+        basic = get_basic_auth(request)
+        token = Token.objects.get(hash=basic)
+        user = token.user
+        if user:
+            queue = Queue.objects.filter(user=user.userinformation)
+            if queue:
+                serializer = QueueSerializer(queue, many=True)
+                return JsonResponse(data=serializer.data, safe=False, status=status.HTTP_200_OK)
+
 # ----------------
 # --- COCKTAIL ---
 # ----------------
@@ -228,6 +259,15 @@ def cocktail_detail(request, pk):
 # ----------------
 # --- USER ---
 # ----------------
+@csrf_exempt
+def create_user(request):
+    data = JSONParser().parse(request)
+    user = User.objects.create_user(username=data['username'], email=data['email'], password=data['password'])
+    userInformation = UserInformation(user=user, coin=data['coin'])
+    user.save()
+    userInformation.save()
+    serializer = UserInformationSerializer(userInformation)
+    return JsonResponse(data=serializer.data, safe=False, status=status.HTTP_501_NOT_IMPLEMENTED)
 
 @csrf_exempt
 def user_list(request):
@@ -313,5 +353,16 @@ def commander(request, pk):
     else:
         return HttpResponse(status=status.HTTP_501_NOT_IMPLEMENTED)
 
+@csrf_exempt
+def addcoin(request):
+    if check_request_token(request):
+        basic = get_basic_auth(request)
+        token = Token.objects.get(hash=basic)
+        user = token.user
+        data = JSONParser().parse(request)
+        if data['coin']:
+            user.userinformation.coin += data['coin']
+            user.userinformation.save()
+            return HttpResponse(status=status.HTTP_200_OK)
 
-
+    return HttpResponse(status=status.HTTP_501_NOT_IMPLEMENTED)
